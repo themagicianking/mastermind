@@ -7,10 +7,18 @@ class Game
     @hint_array = ['-', '-', '-', '-']
   end
 
-  def turn(guess_array)
-    puts 'Please enter your choices :)'
-    # figure out the easiest way to get this. in any case this should store an array
-    @guess_array = guess_array
+  def turn
+    puts 'You have four possible colors: R, Y, G, and B.'
+    puts 'Please input your first choice.'
+    @choice_one = gets.chomp
+    puts 'Please input your second choice.'
+    @choice_two = gets.chomp
+    puts 'Please input your third choice.'
+    @choice_three = gets.chomp
+    puts 'Please input your fourth choice.'
+    @choice_four = gets.chomp
+    # sanitize the input later
+    @guess_array = [@choice_one, @choice_two, @choice_three, @choice_four]
   end
 
   def win_check(secret_array, guess_array)
@@ -27,3 +35,6 @@ class Game
     # every time those exist, push BL
   end
 end
+
+game = Game.new(['R', 'R', 'R', 'R'])
+game.turn
