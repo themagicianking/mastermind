@@ -1,5 +1,5 @@
 class GuesserGame
-  attr_reader :secret_array, :guess_array, :hint_array, :game_over
+  attr_reader :secret_array, :guess_array, :hint_array, :game_over, :random_color_generator
 
   def initialize
     @secret_array = []
@@ -16,6 +16,22 @@ class GuesserGame
         @secret_array[i] = 'G'
       else
         @secret_array[i] = 'B'
+      end
+    end
+  end
+
+  def random_color_generator
+    i = 0
+    for i in 0..3
+      x = rand(1..4)
+      if x == 1
+        @random_color = 'R'
+      elsif x == 2
+        @random_color = 'Y'
+      elsif x == 3
+        @random_color = 'G'
+      else
+        @random_color = 'B'
       end
     end
   end
@@ -49,6 +65,7 @@ class GuesserGame
       elsif secret_array.include? guess_array[i]
         hint_array[i] = 'O'
       else
+        hint_array[i] = '-'
       end
     end
   end
@@ -69,13 +86,35 @@ class SecretGame < GuesserGame
     @choice_four = gets.chomp
     # sanitize the input later
     @secret_array = [ @choice_one, @choice_two, @choice_three, @choice_four]
+    @turns_taken = 0
   end
 
   def computer_turn
-    # if first turn, generate random code to guess at
-    # if not: keep anything BL
-    # anything with - use W if possible
-    # work out more sophisticated logic later that's a lot
+    if @turns_taken == 0
+      i = 0
+      for i in 0..3
+        x = rand(1..4)
+        if x == 1
+          @guess_array[i] = 'R'
+        elsif x == 2
+          @guess_array[i] = 'Y'
+        elsif x == 3
+          @guess_array[i] = 'G'
+        else
+          @guess_array[i] = 'B'
+        end
+      end
+    else
+      i = 0
+      for i in i..3
+        if hint_array[i] != 'X'
+          guess_array[i] = random_color
+        elsif hint_array.include? 'O'
+          # put in this one. maybe.
+        else
+        end
+      end
+    @turns_taken = @turns_taken + 1
   end
 
   def player_turn
