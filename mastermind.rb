@@ -2,9 +2,22 @@ class Game
   attr_reader :secret_array, :guess_array, :hint_array, :game_over
 
   def initialize(secret_array)
-    @secret_array = secret_array
+    @secret_array = []
     @game_over = false
     @hint_array = ['-', '-', '-', '-']
+    i = 0
+    for i in 0..3
+      x = rand(1..4)
+      if x == 1
+        @secret_array[i] = 'R'
+      elsif x == 2
+        @secret_array[i] = 'Y'
+      elsif x == 3
+        @secret_array[i] = 'G'
+      else
+        @secret_array[i] = 'B'
+      end
+    end
   end
 
   def turn
