@@ -68,39 +68,24 @@ end
 
 class SecretGame
   include MasterGame
-  attr_reader :hint_array, :guess_array, :secret_array
-  attr_accessor :guess_array
+  attr_reader :player_array, :game_over, :random_array, :hint_array
+  attr_accessor :guess_array, :secret_array
 
   def initialize
-    puts 'You have four possible colors: R, Y, G, and B.'
-    puts 'Please input your first choice.'
-    @choice_one = gets.chomp
-    puts 'Please input your second choice.'
-    @choice_two = gets.chomp
-    puts 'Please input your third choice.'
-    @choice_three = gets.chomp
-    puts 'Please input your fourth choice.'
-    @choice_four = gets.chomp
-    # sanitize the input later
-    @secret_array = [ @choice_one, @choice_two, @choice_three, @choice_four]
-    @turns_taken = 0
+    @game_over = false
+    @random_array = []
+    @hint_array = ['-', '-', '-', '-']
   end
 
-  def computer_turn
-    if @turns_taken == 0
-      # use random color generator
-      @guess_array = [ game.random_color_generator.random_color, game.random_color_generator.random_color, game.random_color_generator.random_color, game.random_color_generator.random_color ]
-    else
-      i = 0
-      for i in i..3
-        if hint_array[i] != 'X'
-          guess_array[i] = random_color
-        else
-          # leave it be for now :)
-        end
+  def computer_turn(hint_array)
+    i = 0
+    for i in i..3
+      if hint_array[i] != 'X'
+        @guess_array[i] = 'random color (will fix later)'
+      else
+        # leave it be fr now :)
       end
     end
-    @turns_taken = @turns_taken + 1
   end
 
   def player_turn
@@ -114,7 +99,7 @@ class SecretGame
     @hint_three = gets.chomp
     puts 'Fourth choice:'
     @hint_four = gets.chomp
-    @hint_array = [ @hint_one, @hint_two, @hint_three, @hint_four ]
+    @hint_array = [@hint_one, @hint_two, @hint_three, @hint_four]
   end
 end
 
@@ -137,7 +122,18 @@ if choice == 'G'
   end
 elsif choice == 'S'
   game = SecretGame.new
-  game.computer_turn
+  game.create_player_array
+  game.secret_array = game.player_array
+  game.random_array_generator
+  game.guess_array = game.random_array
+
+   while game.game_over == false
+     game.computer_turn(game.hint_array)
+     puts "Computer guess:"
+     puts game.guess_array
+     game.player_turn
+     game.win_check(game.secret_array, game.guess_array)
+   end
 else
   puts "Invalid input!"
 end
