@@ -1,26 +1,5 @@
-class GuesserGame
-  attr_reader :secret_array, :guess_array, :hint_array, :game_over, :random_color_generator
-
-  def initialize
-    @secret_array = []
-    @game_over = false
-    @hint_array = ['-', '-', '-', '-']
-    i = 0
-    for i in 0..3
-      x = rand(1..4)
-      if x == 1
-        @secret_array[i] = 'R'
-      elsif x == 2
-        @secret_array[i] = 'Y'
-      elsif x == 3
-        @secret_array[i] = 'G'
-      else
-        @secret_array[i] = 'B'
-      end
-    end
-  end
-
-  def random_color_generator
+module MasterGame
+  def random_array_generator
     i = 0
     for i in 0..3
       x = rand(1..4)
@@ -33,10 +12,11 @@ class GuesserGame
       else
         @random_color = 'B'
       end
+      @random_array[i] = @random_color
     end
   end
 
-  def turn
+  def create_player_array
     puts 'You have four possible colors: R, Y, G, and B.'
     puts 'Please input your first choice.'
     @choice_one = gets.chomp
@@ -47,7 +27,7 @@ class GuesserGame
     puts 'Please input your fourth choice.'
     @choice_four = gets.chomp
     # sanitize the input later
-    @guess_array = [ @choice_one, @choice_two, @choice_three, @choice_four]
+    @player_array = [@choice_one, @choice_two, @choice_three, @choice_four]
   end
 
   def win_check(secret_array, guess_array)
@@ -55,6 +35,21 @@ class GuesserGame
       puts 'You guessed it!'
       @game_over = true
     end
+  end
+end
+
+class GuesserGame
+  include MasterGame
+  attr_reader :hint_array, :player_array, :random_array, :game_over
+  attr_accessor :guess_array, :secret_array
+
+  def initialize
+    @secret_array = []
+    @guess_array = []
+    @hint_array = []
+    @player_array = []
+    @random_array = []
+    @game_over = false
   end
 
   def hint_generator(secret_array, guess_array, hint_array)
@@ -71,8 +66,10 @@ class GuesserGame
   end
 end
 
-class SecretGame < GuesserGame
-  attr_reader :secret_array, :hint_array
+class SecretGame
+  include MasterGame
+  attr_reader :hint_array, :guess_array, :secret_array
+  attr_accessor :guess_array
 
   def initialize
     puts 'You have four possible colors: R, Y, G, and B.'
@@ -91,29 +88,18 @@ class SecretGame < GuesserGame
 
   def computer_turn
     if @turns_taken == 0
-      i = 0
-      for i in 0..3
-        x = rand(1..4)
-        if x == 1
-          @guess_array[i] = 'R'
-        elsif x == 2
-          @guess_array[i] = 'Y'
-        elsif x == 3
-          @guess_array[i] = 'G'
-        else
-          @guess_array[i] = 'B'
-        end
-      end
+      # use random color generator
+      @guess_array = [ game.random_color_generator.random_color, game.random_color_generator.random_color, game.random_color_generator.random_color, game.random_color_generator.random_color ]
     else
       i = 0
       for i in i..3
         if hint_array[i] != 'X'
           guess_array[i] = random_color
-        elsif hint_array.include? 'O'
-          # put in this one. maybe.
         else
+          # leave it be for now :)
         end
       end
+    end
     @turns_taken = @turns_taken + 1
   end
 
@@ -136,9 +122,12 @@ puts 'Hello! Type G to be the guesser or S to be the secret code maker.'
 choice = gets.chomp
 if choice == 'G'
   game = GuesserGame.new
+  game.random_array_generator
+  game.secret_array = game.random_array
 
   while game.game_over == false
-    game.turn
+    game.create_player_array
+    game.guess_array = game.player_array
     game.win_check(game.secret_array, game.guess_array)
     break if game.game_over == true
     game.hint_generator(game.secret_array, game.guess_array, game.hint_array)
@@ -148,6 +137,7 @@ if choice == 'G'
   end
 elsif choice == 'S'
   game = SecretGame.new
+  game.computer_turn
 else
   puts "Invalid input!"
 end
