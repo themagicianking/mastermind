@@ -29,13 +29,6 @@ module MasterGame
     # sanitize the input later
     @player_array = [@choice_one, @choice_two, @choice_three, @choice_four]
   end
-
-  def win_check(secret_array, guess_array)
-    if secret_array == guess_array
-      puts 'You guessed it!'
-      @game_over = true
-    end
-  end
 end
 
 class GuesserGame
@@ -64,6 +57,13 @@ class GuesserGame
       end
     end
   end
+
+  def win_check(secret_array, guess_array)
+    if secret_array == guess_array
+      puts 'Correct! Game over :)'
+      @game_over = true
+    end
+  end
 end
 
 class SecretGame
@@ -83,7 +83,7 @@ class SecretGame
       if hint_array[i] != 'X'
         @guess_array[i] = random_array[i]
       else
-        @guess_array[i] = @guess_array[i]
+        @guess_array[i] = @secret_array[i]
       end
     end
   end
@@ -100,6 +100,13 @@ class SecretGame
     puts 'Fourth choice:'
     @hint_four = gets.chomp
     @hint_array = [@hint_one, @hint_two, @hint_three, @hint_four]
+  end
+
+  def win_check(hint_array)
+    if hint_array == ['X', 'X', 'X', 'X']
+      puts 'I guessed it! Game over :)'
+      @game_over = true
+    end
   end
 end
 
@@ -118,7 +125,7 @@ if choice == 'G'
     game.hint_generator(game.secret_array, game.guess_array, game.hint_array)
     puts "Not quite. An X means an exact guess, and an O means right color, wrong spot."
     puts "Here's how close you came:"
-    puts game.hint_array
+    puts game.hint_array.join(' ')
   end
 elsif choice == 'S'
   game = SecretGame.new
@@ -126,15 +133,18 @@ elsif choice == 'S'
   game.secret_array = game.player_array
   game.random_array_generator
   game.guess_array = game.random_array
+  puts 'Computer guess:'
+  puts game.guess_array.join(' ')
 
-   while game.game_over == false
-     game.random_array_generator
-     game.computer_turn(game.hint_array, game.random_array)
-     puts "Computer guess:"
-     puts game.guess_array
-     game.player_turn
-     game.win_check(game.secret_array, game.guess_array)
-   end
+  while game.game_over == false
+    game.player_turn
+    game.win_check(game.hint_array)
+    break if game.game_over == true
+    game.random_array_generator
+    game.computer_turn(game.hint_array, game.random_array)
+    puts 'Computer guess:'
+    puts game.guess_array.join(' ')
+  end
 else
   puts "Invalid input!"
 end
