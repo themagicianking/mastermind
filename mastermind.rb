@@ -77,13 +77,13 @@ class SecretGame
     @hint_array = ['-', '-', '-', '-']
   end
 
-  def computer_turn(hint_array)
+  def computer_turn(hint_array, random_array)
     i = 0
     for i in i..3
       if hint_array[i] != 'X'
-        @guess_array[i] = 'random color (will fix later)'
+        @guess_array[i] = random_array[i]
       else
-        # leave it be fr now :)
+        @guess_array[i] = @guess_array[i]
       end
     end
   end
@@ -128,7 +128,8 @@ elsif choice == 'S'
   game.guess_array = game.random_array
 
    while game.game_over == false
-     game.computer_turn(game.hint_array)
+     game.random_array_generator
+     game.computer_turn(game.hint_array, game.random_array)
      puts "Computer guess:"
      puts game.guess_array
      game.player_turn
